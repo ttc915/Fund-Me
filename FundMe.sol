@@ -8,6 +8,8 @@ import {PriceConverter} from "./PriceConvertor.sol";
 // set a minimum funding value in USD
 
 
+error notOwner();
+
 // 596947
 contract FundMe {
 
@@ -54,12 +56,13 @@ contract FundMe {
 
         // reset array
         funders = new address[](0);
-    }
-
+        (bool callSuccess, ) = payable (msg.sender).call{value: address(this).balance}("");
+        require(callSuccess, "Call failed");
     }
 
     modifier onlyOwner {
-        require(msg.sender == i_owner, "sender is not owner");
+        // require(msg.sender == i_owner, "Sender is not owner");
+        if (msg.sender != i_owner) { revert notOwner(); }
         _;
     }
 
